@@ -2,7 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:webfeed/webfeed.dart';
 
 class FeedsPage extends StatefulWidget {
   @override
@@ -27,6 +30,7 @@ class _FeedsPageState extends State<FeedsPage> {
       setState(() {
         feeds = savedFeedFromJson(feedsJSON);
       });
+      loadFeedNames();
     });
   }
 
@@ -103,7 +107,7 @@ class _FeedsPageState extends State<FeedsPage> {
                 itemBuilder: (context, index){
                   SavedFeed f = feeds[index];
                   return Dismissible(
-                      key: Key('${f.id}-${f.url}'),
+                      key: f.uniqueKey,
                       background: Container(color: Colors.red),
                       onDismissed: (direction) {
                         setState(() {
@@ -116,8 +120,8 @@ class _FeedsPageState extends State<FeedsPage> {
                             .showSnackBar(SnackBar(content: Text("Feed has been removed")));
                       },
                       child: ListTile(
-                        title: Text('[#${f.id}] ' + f.url),
-                        leading: Icon(Icons.rss_feed),
+                        title: Text('[#${f.id}] ' + (f.name ?? "Loading Name...")),
+                        subtitle: Text(f.url),
                         trailing: IconButton(
                           icon: Icon(Icons.chevron_right),
                           onPressed: (){
@@ -150,6 +154,7 @@ class _FeedsPageState extends State<FeedsPage> {
     fixFeedOrder();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("rss_feeds", savedFeedToJson(feeds));
+    loadFeedNames();
   }
 
   void fixFeedOrder(){
@@ -158,6 +163,26 @@ class _FeedsPageState extends State<FeedsPage> {
         feeds[i].id = i;
       }
     });
+  }
+
+  void loadFeedNames() async {
+    for(int i = 0; i < feeds.length; i++){
+      SavedFeed feed = feeds[i];
+
+      if(feed.name == null){
+        var response = await http.get(feed.url);
+        if (response.statusCode == 200) {
+          var rssFeed = RssFeed.parse(response.body);
+           setState(() {
+             feed.name = rssFeed.title;
+           });
+        } else {
+          setState(() {
+            feed.name = "Error Loading Name";
+          });
+        }
+      }
+    }
   }
 
   @override

@@ -5,6 +5,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:webfeed/domain/rss_feed.dart';
 
 List<SavedFeed> savedFeedFromJson(String str) => List<SavedFeed>.from(json.decode(str).map((x) => SavedFeed.fromJson(x)));
 
@@ -18,7 +19,7 @@ class SavedFeed {
 
   int id;
   String url;
-  String name;
+  RssFeed loadedFeed;
   Key uniqueKey = UniqueKey();
 
   factory SavedFeed.fromJson(Map<String, dynamic> json) => SavedFeed(

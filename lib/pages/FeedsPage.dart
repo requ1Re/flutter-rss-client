@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_rss_client/pages/FeedViewPage.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -116,18 +117,19 @@ class _FeedsPageState extends State<FeedsPage> {
                         fixFeedOrder();
                         saveFeeds();
 
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text("Feed has been removed")));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Feed has been removed")));
                       },
                       child: ListTile(
-                        title: Text('[#${f.id}] ' + (f.name ?? "Loading Name...")),
+                        title: Text(f.loadedFeed?.title ?? 'Feed #$index'),
                         subtitle: Text(f.url),
-                        trailing: IconButton(
-                          icon: Icon(Icons.chevron_right),
-                          onPressed: (){
-                            // TODO: Navigate to Feed
-                          },
-                        ),
+                        trailing: Icon(Icons.chevron_right),
+                        onTap: (){
+                          if(f.loadedFeed != null) {
+                            _navigateToScreen(FeedViewPage(feed: f.loadedFeed));
+                          }else{
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Feed is still loading. Please wait.")));
+                          }
+                        },
                       )
                   );
                 },
@@ -169,20 +171,23 @@ class _FeedsPageState extends State<FeedsPage> {
     for(int i = 0; i < feeds.length; i++){
       SavedFeed feed = feeds[i];
 
-      if(feed.name == null){
+      if(feed.loadedFeed == null){
         var response = await http.get(feed.url);
         if (response.statusCode == 200) {
           var rssFeed = RssFeed.parse(response.body);
            setState(() {
-             feed.name = rssFeed.title;
+             feed.loadedFeed = rssFeed;
            });
-        } else {
-          setState(() {
-            feed.name = "Error Loading Name";
-          });
         }
       }
     }
+  }
+
+  void _navigateToScreen(Widget screen){
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
   }
 
   @override

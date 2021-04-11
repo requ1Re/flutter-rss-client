@@ -70,22 +70,35 @@ class _FeedsPageState extends State<FeedsPage> {
               ],
             ),
             Expanded(
-              child: ReorderableListView(
-                children: [
-                  for(SavedFeed f in feeds)
-                    ListTile(
-                      key: Key('${f.id}'),
-                      title: Text('[#${f.id}] ' + f.url),
-                      leading: Icon(Icons.rss_feed),
-                      enableFeedback: true,
-                      trailing: IconButton(
-                        icon: Icon(Icons.chevron_right),
-                        onPressed: (){
-                          // TODO: Navigate to Feed
-                        },
-                      ),
-                    )
-                ],
+              child: ReorderableListView.builder(
+                itemCount: feeds.length,
+                itemBuilder: (context, index){
+                  SavedFeed f = feeds[index];
+                  return Dismissible(
+                      key: Key('${f.id}-${f.url}'),
+                      background: Container(color: Colors.red),
+                      onDismissed: (direction) {
+                        setState(() {
+                          feeds.removeAt(index);
+                        });
+                        fixFeedOrder();
+                        saveFeeds();
+
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text("Feed has been removed")));
+                      },
+                      child: ListTile(
+                        title: Text('[#${f.id}] ' + f.url),
+                        leading: Icon(Icons.rss_feed),
+                        trailing: IconButton(
+                          icon: Icon(Icons.chevron_right),
+                          onPressed: (){
+                            // TODO: Navigate to Feed
+                          },
+                        ),
+                      )
+                  );
+                },
                 onReorder: (int oldIndex, int newIndex) {
                   setState(() {
                     if (oldIndex < newIndex) {

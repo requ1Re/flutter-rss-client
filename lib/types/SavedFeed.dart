@@ -16,6 +16,7 @@ class SavedFeed {
 
   int id;
   String url;
+  String name;
 
   factory SavedFeed.fromJson(Map<String, dynamic> json) => SavedFeed(
     id: json["id"],

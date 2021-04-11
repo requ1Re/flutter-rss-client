@@ -12,6 +12,7 @@ class FeedsPage extends StatefulWidget {
 class _FeedsPageState extends State<FeedsPage> {
   List<SavedFeed> feeds = [];
   final _feedAddController = TextEditingController();
+  bool _validationFailed = false;
 
   @override
   void initState() {
@@ -23,7 +24,9 @@ class _FeedsPageState extends State<FeedsPage> {
   void loadFeeds(){
     SharedPreferences.getInstance().then((prefs) {
       String feedsJSON = prefs.getString("rss_feeds") ?? "[]";
-      feeds = savedFeedFromJson(feedsJSON);
+      setState(() {
+        feeds = savedFeedFromJson(feedsJSON);
+      });
     });
   }
 
@@ -34,40 +37,65 @@ class _FeedsPageState extends State<FeedsPage> {
         title: Text("Feeds"),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
         child: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _feedAddController,
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _feedAddController,
+                      textAlign: TextAlign.left,
+                      decoration: InputDecoration(
                         prefixIcon: Icon(Icons.rss_feed),
                         border: OutlineInputBorder(),
-                        hintText: "Feed URL"
+                        labelText: "Add Feed",
+                        hintText: "Feed URL",
+                        errorText: _validationFailed ? "Please enter an URL." : null
+                      ),
+                      onChanged: (str){
+                        setState(() {
+                          _validationFailed = false;
+                        });
+                      },
                     ),
                   ),
-                ),
-                IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () async {
-                      if(_feedAddController.text.length > 0) {
-                        setState(() {
-                          SavedFeed _newFeed = new SavedFeed(
-                            id: feeds.length,
-                            url: _feedAddController.text
-                          );
-                          feeds.add(_newFeed);
-                          _feedAddController.clear();
-                        });
+                  IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () async {
+                        bool _success = true;
+                        if(_feedAddController.text.length > 0) {
+                          if(Uri.parse(_feedAddController.text).isAbsolute){
+                            setState(() {
+                              SavedFeed _newFeed = new SavedFeed(
+                                  id: feeds.length,
+                                  url: _feedAddController.text
+                              );
+                              feeds.add(_newFeed);
+                              _feedAddController.clear();
+                            });
 
-                        saveFeeds();
+                            saveFeeds();
+                          }else{
+                            _success = false;
+                          }
+                        }else{
+                          _success = false;
+                        }
+                        setState(() {
+                          _validationFailed = !_success;
+                        });
                       }
-                    }
-                )
-              ],
+                  )
+                ],
+              ),
+            ),
+            Divider(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Text("Saved Feeds", style: TextStyle(fontSize: 32)),
             ),
             Expanded(
               child: ReorderableListView.builder(
@@ -119,6 +147,7 @@ class _FeedsPageState extends State<FeedsPage> {
   }
 
   void saveFeeds() async {
+    fixFeedOrder();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("rss_feeds", savedFeedToJson(feeds));
   }

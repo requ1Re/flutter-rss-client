@@ -100,7 +100,7 @@ class _FeedsPageState extends State<FeedsPage> {
             Divider(),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: Text("Saved Feeds", style: TextStyle(fontSize: 32)),
+              child: Text("Feeds", style: TextStyle(fontSize: 32)),
             ),
             Expanded(
               child: ReorderableListView.builder(
@@ -171,14 +171,23 @@ class _FeedsPageState extends State<FeedsPage> {
     for(int i = 0; i < feeds.length; i++){
       SavedFeed feed = feeds[i];
 
-      if(feed.loadedFeed == null){
-        var response = await http.get(feed.url);
-        if (response.statusCode == 200) {
-          var rssFeed = RssFeed.parse(response.body);
-           setState(() {
-             feed.loadedFeed = rssFeed;
-           });
+      try {
+        if(feed.loadedFeed == null){
+          var response = await http.get(feed.url);
+          if (response.statusCode == 200) {
+            var rssFeed = RssFeed.parse(response.body);
+            setState(() {
+              feed.loadedFeed = rssFeed;
+            });
+          }
         }
+      }catch(err){
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Error while loading Feed #$i: ' + err.toString(), style: TextStyle(color: Colors.white)),
+                backgroundColor: Colors.red
+            )
+        );
       }
     }
   }

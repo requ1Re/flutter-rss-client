@@ -32,6 +32,7 @@ class AppTheme with ChangeNotifier {
   AppTheme() {
     SharedPreferences.getInstance().then((prefs) {
       _isDark = prefs.getBool("enableDarkTheme") ?? true;
+      notifyListeners();
     });
   }
 

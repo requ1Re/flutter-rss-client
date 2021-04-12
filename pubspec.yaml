@@ -30,6 +30,7 @@ dependencies:
   webfeed: ^0.6.0
   badges: ^1.2.0
   intl: ^0.16.0
+  google_fonts: ^1.1.2
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/FeedViewPage.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
@@ -38,12 +39,10 @@ class _FeedsPageState extends State<FeedsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Feeds"),
-      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -68,31 +67,32 @@ class _FeedsPageState extends State<FeedsPage> {
                     ),
                   ),
                   IconButton(
-                      icon: Icon(Icons.add),
-                      onPressed: () async {
-                        bool _success = true;
-                        if(_feedAddController.text.length > 0) {
-                          if(Uri.parse(_feedAddController.text).isAbsolute){
-                            setState(() {
-                              SavedFeed _newFeed = new SavedFeed(
-                                  id: feeds.length,
-                                  url: _feedAddController.text
-                              );
-                              feeds.add(_newFeed);
-                              _feedAddController.clear();
-                            });
+                    color: Theme.of(context).primaryColor,
+                    icon: Icon(Icons.add),
+                    onPressed: () async {
+                      bool _success = true;
+                      if(_feedAddController.text.length > 0) {
+                        if(Uri.parse(_feedAddController.text).isAbsolute){
+                          setState(() {
+                            SavedFeed _newFeed = new SavedFeed(
+                                id: feeds.length,
+                                url: _feedAddController.text
+                            );
+                            feeds.add(_newFeed);
+                            _feedAddController.clear();
+                          });
 
-                            saveFeeds();
-                          }else{
-                            _success = false;
-                          }
+                          saveFeeds();
                         }else{
                           _success = false;
                         }
-                        setState(() {
-                          _validationFailed = !_success;
-                        });
+                      }else{
+                        _success = false;
                       }
+                      setState(() {
+                        _validationFailed = !_success;
+                      });
+                    }
                   )
                 ],
               ),
@@ -100,7 +100,7 @@ class _FeedsPageState extends State<FeedsPage> {
             Divider(),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: Text("Feeds", style: TextStyle(fontSize: 32)),
+              child: Text("Subscriptions", style: TextStyle(fontSize: 32, color: Theme.of(context).primaryColor))
             ),
             Expanded(
               child: ReorderableListView.builder(
@@ -122,7 +122,10 @@ class _FeedsPageState extends State<FeedsPage> {
                       child: ListTile(
                         title: Text(f.loadedFeed?.title ?? 'Feed #$index'),
                         subtitle: Text(f.url),
-                        trailing: Icon(Icons.chevron_right),
+                        trailing: Badge(
+                          badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0", style: TextStyle(color: Colors.white)),
+                          badgeColor: Theme.of(context).primaryColor,
+                        ),
                         onTap: (){
                           if(f.loadedFeed != null) {
                             _navigateToScreen(FeedViewPage(feed: f.loadedFeed));

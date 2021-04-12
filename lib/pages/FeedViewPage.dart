@@ -19,6 +19,7 @@ class _FeedViewPageState extends State<FeedViewPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.feed.title),
+        brightness: Brightness.dark,
       ),
       body: ListView.builder(
         itemCount: widget.feed.items.length,
@@ -30,7 +31,7 @@ class _FeedViewPageState extends State<FeedViewPage> {
                 elevation: 20,
                 child: ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  title: Text(item.title),
+                  title: Text(item.title, style: TextStyle(color: Theme.of(context).primaryColor)),
                   subtitle: Column(
                     children: [
                       Text(item.description),

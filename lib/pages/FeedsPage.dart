@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/FeedViewPage.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:webfeed/webfeed.dart';
@@ -40,66 +41,12 @@ class _FeedsPageState extends State<FeedsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+        padding: EdgeInsets.only(top: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _feedAddController,
-                      textAlign: TextAlign.left,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.rss_feed),
-                        border: OutlineInputBorder(),
-                        labelText: "Add Feed",
-                        hintText: "Feed URL",
-                        errorText: _validationFailed ? "Please enter an URL." : null
-                      ),
-                      onChanged: (str){
-                        setState(() {
-                          _validationFailed = false;
-                        });
-                      },
-                    ),
-                  ),
-                  IconButton(
-                    color: Theme.of(context).primaryColor,
-                    icon: Icon(Icons.add),
-                    onPressed: () async {
-                      bool _success = true;
-                      if(_feedAddController.text.length > 0) {
-                        if(Uri.parse(_feedAddController.text).isAbsolute){
-                          setState(() {
-                            SavedFeed _newFeed = new SavedFeed(
-                                id: feeds.length,
-                                url: _feedAddController.text
-                            );
-                            feeds.add(_newFeed);
-                            _feedAddController.clear();
-                          });
-
-                          saveFeeds();
-                        }else{
-                          _success = false;
-                        }
-                      }else{
-                        _success = false;
-                      }
-                      setState(() {
-                        _validationFailed = !_success;
-                      });
-                    }
-                  )
-                ],
-              ),
-            ),
-            Divider(),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
               child: Text("Subscriptions", style: TextStyle(fontSize: 32, color: Theme.of(context).primaryColor))
             ),
             Expanded(
@@ -148,9 +95,83 @@ class _FeedsPageState extends State<FeedsPage> {
                   saveFeeds();
                 },
               ),
-            )
+            ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showMaterialModalBottomSheet(
+            shape: ContinuousRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(25),
+                    topRight: Radius.circular(25)
+                )
+            ),
+            useRootNavigator: true,
+            context: context,
+            builder: (context){
+              return StatefulBuilder(
+                builder: (context, setState){
+                  return Padding(
+                    padding: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10 + MediaQuery.of(context).viewInsets.bottom),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _feedAddController,
+                            textAlign: TextAlign.left,
+                            decoration: InputDecoration(
+                                prefixIcon: Icon(Icons.rss_feed),
+                                border: OutlineInputBorder(),
+                                labelText: "Add Feed",
+                                hintText: "Feed URL",
+                                errorText: _validationFailed ? "Please enter an URL." : null
+                            ),
+                            onChanged: (str){
+                              setState(() {
+                                _validationFailed = false;
+                              });
+                            },
+                          ),
+                        ),
+                        IconButton(
+                            color: Theme.of(context).primaryColor,
+                            icon: Icon(Icons.add),
+                            onPressed: () async {
+                              bool _success = true;
+                              if(_feedAddController.text.length > 0) {
+                                if(Uri.parse(_feedAddController.text).isAbsolute){
+                                  setState(() {
+                                    SavedFeed _newFeed = new SavedFeed(
+                                        id: feeds.length,
+                                        url: _feedAddController.text
+                                    );
+                                    feeds.add(_newFeed);
+                                    _feedAddController.clear();
+                                  });
+
+                                  saveFeeds();
+                                }else{
+                                  _success = false;
+                                }
+                              }else{
+                                _success = false;
+                              }
+                              setState(() {
+                                _validationFailed = !_success;
+                              });
+                            }
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
+        child: Icon(Icons.add),
       ),
     );
   }

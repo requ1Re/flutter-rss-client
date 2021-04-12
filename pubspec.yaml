@@ -31,6 +31,8 @@ dependencies:
   badges: ^1.2.0
   intl: ^0.16.0
   google_fonts: ^1.1.2
+  url_launcher: ^5.7.10
+  modal_bottom_sheet: ^1.0.0+1
 
 
   # The following adds the Cupertino Icons font to your application.

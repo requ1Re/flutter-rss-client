@@ -14,7 +14,8 @@ class FlutterRSSClient extends StatelessWidget {
     textTheme: GoogleFonts.montserratTextTheme(),
     brightness: Brightness.light,
     canvasColor: Color.fromRGBO(242, 243, 248, 1),
-    primaryColor: Color.fromRGBO(72, 52, 212, 1)
+    primaryColor: Color.fromRGBO(72, 52, 212, 1),
+    accentColor: Color.fromRGBO(72, 52, 212, 1)
   );
 
   // This widget is the root of your application.

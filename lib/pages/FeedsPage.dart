@@ -1,13 +1,13 @@
 import 'dart:ui';
 
 import 'package:badges/badges.dart';
+import 'package:dart_rss/dart_rss.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/FeedViewPage.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:webfeed/webfeed.dart';
 
 class FeedsPage extends StatefulWidget {
   @override
@@ -218,7 +218,7 @@ class _FeedsPageState extends State<FeedsPage> {
 
       try {
         if (feed.loadedFeed == null) {
-          var response = await http.get(feed.url);
+          var response = await http.get(Uri.parse(feed.url));
           if (response.statusCode == 200) {
             var rssFeed = RssFeed.parse(response.body);
             setState(() {

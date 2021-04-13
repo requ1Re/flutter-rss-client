@@ -1,8 +1,8 @@
 import 'dart:ui';
+import 'package:dart_rss/dart_rss.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webfeed/webfeed.dart';
 import 'package:intl/intl.dart';
 
 class FeedViewPage extends StatefulWidget {
@@ -68,7 +68,7 @@ class _FeedViewPageState extends State<FeedViewPage> {
     }
     if (item.pubDate != null) {
       _card.add(Divider());
-      _card.add(Text("Published " + DateFormat().format(item.pubDate.toLocal()), style: TextStyle(color: Theme.of(context).primaryColor)));
+      _card.add(Text("Published " + DateFormat().format(DateTime.parse(item.pubDate)), style: TextStyle(color: Theme.of(context).primaryColor)));
       hasOnlyTitle = false;
     }
     _card.insert(0, Text(item.title, style: hasOnlyTitle ? null : TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)));

@@ -1,6 +1,13 @@
-# Flutter RSS Cclient
-
+# Flutter RSS Client
 A simple RSS Reader made with Flutter
+
+## Current Features
+- Adding feeds by URL
+- Viewing feed articles
+- Dark/Light themes
+
+## Planned Features
+- Offline functionality
 
 ## Screenshots
 Taken April 12th, 2021

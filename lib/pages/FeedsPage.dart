@@ -102,11 +102,23 @@ class _FeedsPageState extends State<FeedsPage> {
                       child: ListTile(
                         title: Text(f.loadedFeed?.title ?? f.url),
                         subtitle: f.loadedFeed == null ? null : Text(f.url),
-                        trailing: Badge(
-                          badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0",
-                              style: TextStyle(color: Colors.white)
-                          ),
-                          badgeColor: Theme.of(context).primaryColor,
+                        horizontalTitleGap: 0,
+                        leading: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            getOfflineAvailabilityIcon(f)
+                          ],
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Badge(
+                              badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0",
+                                  style: TextStyle(color: Colors.white)
+                              ),
+                              badgeColor: Theme.of(context).primaryColor,
+                            )
+                          ],
                         ),
                         onTap: () {
                           if (f.loadedFeed != null) {
@@ -266,7 +278,9 @@ class _FeedsPageState extends State<FeedsPage> {
     showMaterialModalBottomSheet(
       shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+              topLeft: Radius.circular(25), topRight: Radius.circular(25)
+          )
+      ),
       useRootNavigator: true,
       context: context,
       builder: (context) {
@@ -277,6 +291,10 @@ class _FeedsPageState extends State<FeedsPage> {
         );
       },
     );
+  }
+
+  Widget getOfflineAvailabilityIcon(SavedFeed f){
+    return f.offlineAvailability ? Icon(Icons.cloud_done, color: Colors.green) : Icon(Icons.cloud_download_outlined, color: Colors.red);
   }
 
   @override

@@ -4,7 +4,6 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/FeedViewPage.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -27,7 +26,7 @@ class _FeedsPageState extends State<FeedsPage> {
     super.initState();
   }
 
-  void loadFeeds(){
+  void loadFeeds() {
     SharedPreferences.getInstance().then((prefs) {
       String feedsJSON = prefs.getString("rss_feeds") ?? "[]";
       setState(() {
@@ -46,13 +45,16 @@ class _FeedsPageState extends State<FeedsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
-              child: Text("Subscriptions", style: TextStyle(fontSize: 32, color: Theme.of(context).primaryColor))
+                padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
+                child: Text("Subscriptions",
+                    style: TextStyle(
+                        fontSize: 32, color: Theme.of(context).primaryColor)
+                )
             ),
             Expanded(
               child: ReorderableListView.builder(
                 itemCount: feeds.length,
-                itemBuilder: (context, index){
+                itemBuilder: (context, index) {
                   SavedFeed f = feeds[index];
                   return Dismissible(
                       key: f.uniqueKey,
@@ -64,24 +66,37 @@ class _FeedsPageState extends State<FeedsPage> {
                         fixFeedOrder();
                         saveFeeds();
 
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Feed has been removed")));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Feed has been removed"))
+                        );
                       },
                       child: ListTile(
                         title: Text(f.loadedFeed?.title ?? 'Feed #$index'),
                         subtitle: Text(f.url),
                         trailing: Badge(
-                          badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0", style: TextStyle(color: Colors.white)),
+                          badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0",
+                              style: TextStyle(color: Colors.white)
+                          ),
                           badgeColor: Theme.of(context).primaryColor,
                         ),
-                        onTap: (){
-                          if(f.loadedFeed != null) {
-                            _navigateToScreen(FeedViewPage(feed: f.loadedFeed));
-                          }else{
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Feed is still loading. Please wait.")));
+                        onTap: () {
+                          if (f.loadedFeed != null) {
+                            loadFeed(f.loadedFeed);
+                            /*
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => screen),
+                            );
+                             */
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text("Feed is still loading. Please wait.")
+                                )
+                            );
                           }
                         },
-                      )
-                  );
+                      ));
                 },
                 onReorder: (int oldIndex, int newIndex) {
                   setState(() {
@@ -110,11 +125,16 @@ class _FeedsPageState extends State<FeedsPage> {
             ),
             useRootNavigator: true,
             context: context,
-            builder: (context){
+            builder: (context) {
               return StatefulBuilder(
-                builder: (context, setState){
+                builder: (context, setState) {
                   return Padding(
-                    padding: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10 + MediaQuery.of(context).viewInsets.bottom),
+                    padding: EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                        top: 10,
+                        bottom: 10 + MediaQuery.of(context).viewInsets.bottom
+                    ),
                     child: Row(
                       children: [
                         Expanded(
@@ -126,9 +146,10 @@ class _FeedsPageState extends State<FeedsPage> {
                                 border: OutlineInputBorder(),
                                 labelText: "Add Feed",
                                 hintText: "Feed URL",
-                                errorText: _validationFailed ? "Please enter an URL." : null
-                            ),
-                            onChanged: (str){
+                                errorText: _validationFailed
+                                    ? "Please enter an URL."
+                                    : null),
+                            onChanged: (str) {
                               setState(() {
                                 _validationFailed = false;
                               });
@@ -140,22 +161,22 @@ class _FeedsPageState extends State<FeedsPage> {
                             icon: Icon(Icons.add),
                             onPressed: () async {
                               bool _success = true;
-                              if(_feedAddController.text.length > 0) {
-                                if(Uri.parse(_feedAddController.text).isAbsolute){
+                              if (_feedAddController.text.length > 0) {
+                                if (Uri.parse(_feedAddController.text)
+                                    .isAbsolute) {
                                   setState(() {
                                     SavedFeed _newFeed = new SavedFeed(
                                         id: feeds.length,
-                                        url: _feedAddController.text
-                                    );
+                                        url: _feedAddController.text);
                                     feeds.add(_newFeed);
                                     _feedAddController.clear();
                                   });
 
                                   saveFeeds();
-                                }else{
+                                } else {
                                   _success = false;
                                 }
-                              }else{
+                              } else {
                                 _success = false;
                               }
                               setState(() {
@@ -183,20 +204,20 @@ class _FeedsPageState extends State<FeedsPage> {
     loadFeedNames();
   }
 
-  void fixFeedOrder(){
+  void fixFeedOrder() {
     setState(() {
-      for(int i = 0; i < feeds.length; i++){
+      for (int i = 0; i < feeds.length; i++) {
         feeds[i].id = i;
       }
     });
   }
 
   void loadFeedNames() async {
-    for(int i = 0; i < feeds.length; i++){
+    for (int i = 0; i < feeds.length; i++) {
       SavedFeed feed = feeds[i];
 
       try {
-        if(feed.loadedFeed == null){
+        if (feed.loadedFeed == null) {
           var response = await http.get(feed.url);
           if (response.statusCode == 200) {
             var rssFeed = RssFeed.parse(response.body);
@@ -205,21 +226,29 @@ class _FeedsPageState extends State<FeedsPage> {
             });
           }
         }
-      }catch(err){
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Error while loading Feed #$i: ' + err.toString(), style: TextStyle(color: Colors.white)),
-                backgroundColor: Colors.red
-            )
-        );
+      } catch (err) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Error while loading Feed #$i: ' + err.toString(),
+                style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.red));
       }
     }
   }
 
-  void _navigateToScreen(Widget screen){
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
+  void loadFeed(RssFeed feed) {
+    showMaterialModalBottomSheet(
+      shape: ContinuousRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+      useRootNavigator: true,
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return FeedViewPage(feed: feed);
+          },
+        );
+      },
     );
   }
 
@@ -229,7 +258,7 @@ class _FeedsPageState extends State<FeedsPage> {
     super.dispose();
   }
 
-  Widget buildFeedListViewItem(SavedFeed feed){
+  Widget buildFeedListViewItem(SavedFeed feed) {
     return Container(
       key: UniqueKey(),
       height: 50,

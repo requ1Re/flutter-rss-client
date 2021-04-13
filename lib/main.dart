@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/FeedsPage.dart';
 import 'package:flutter_rss_client/utils/AppTheme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(FlutterRSSClient());
@@ -15,17 +14,11 @@ class FlutterRSSClient extends StatefulWidget {
 }
 
 class _FlutterRSSClientState extends State<FlutterRSSClient> {
-  int _page = 0;
-  PageController _c;
-
   AppTheme theme = AppTheme();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    _c =  new PageController(
-      initialPage: _page,
-    );
     theme.addListener(() {
       setState(() {});
     });
@@ -38,18 +31,14 @@ class _FlutterRSSClientState extends State<FlutterRSSClient> {
       theme: theme.currentTheme(),
       home: Scaffold(
         appBar: AppBar(
-          title: Text("Flutter RSS"),
+          title: Text("Flutter RSS Client"),
           elevation: 10,
           brightness: Brightness.dark,
-          shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(25),
-                  bottomRight: Radius.circular(25)
-              )
-          ),
           actions: [
             IconButton(
-                icon: theme.isDark() ? FaIcon(FontAwesomeIcons.solidSun) : FaIcon(FontAwesomeIcons.solidMoon),
+                icon: theme.isDark()
+                    ? FaIcon(FontAwesomeIcons.solidSun)
+                    : FaIcon(FontAwesomeIcons.solidMoon),
                 onPressed: () => theme.switchTheme()
             )
           ],

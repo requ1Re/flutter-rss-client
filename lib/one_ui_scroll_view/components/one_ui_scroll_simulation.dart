@@ -12,7 +12,7 @@ class OneUiScrollSimulation extends Simulation {
     @required this.expandedHeight,
     this.friction = 0.015,
     Tolerance tolerance = Tolerance.defaultTolerance,
-  }) : assert(_flingVelocityPenetration(0.0) == _initialVelocityPenetration),
+  })  : assert(_flingVelocityPenetration(0.0) == _initialVelocityPenetration),
         super(tolerance: tolerance) {
     _duration = _flingDuration(velocity);
     _distance = (velocity * _duration / _initialVelocityPenetration).abs();
@@ -50,7 +50,8 @@ class OneUiScrollSimulation extends Simulation {
     final double scaledFriction = friction * _decelerationForFriction(0.84);
 
     // See getSplineDeceleration().
-    final double deceleration = math.log(0.35 * velocity.abs() / scaledFriction);
+    final double deceleration =
+        math.log(0.35 * velocity.abs() / scaledFriction);
 
     return math.exp(deceleration / (_kDecelerationRate - 1.0));
   }
@@ -72,7 +73,9 @@ class OneUiScrollSimulation extends Simulation {
   //      = 1.2 t^3 - 3.27 t^2 + 3.065 t
   static const double _initialVelocityPenetration = 3.065;
   static double _flingDistancePenetration(double t) {
-    return (1.2 * t * t * t) - (3.27 * t * t) + (_initialVelocityPenetration * t);
+    return (1.2 * t * t * t) -
+        (3.27 * t * t) +
+        (_initialVelocityPenetration * t);
   }
 
   // The derivative of the _flingDistancePenetration() function.
@@ -96,7 +99,7 @@ class OneUiScrollSimulation extends Simulation {
   bool isDone(double time) {
     // If scroll direction was upward, and didn't reached the top of the scroll
     // when tapped down, scrolling stops at the top except when dragging.
-    return (position > expandedHeight && velocity.isNegative)
-        || time >= _duration;
+    return (position > expandedHeight && velocity.isNegative) ||
+        time >= _duration;
   }
 }

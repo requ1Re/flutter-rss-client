@@ -8,7 +8,7 @@ const Divider _kBottomDivider = const Divider(
   color: Colors.white54,
 );
 
-const double _kExpendedAppBarHeightRatio = 3/8;
+const double _kExpendedAppBarHeightRatio = 3 / 8;
 
 class OneUiScrollView extends StatefulWidget {
   OneUiScrollView({
@@ -25,7 +25,7 @@ class OneUiScrollView extends StatefulWidget {
     this.backgroundColor,
     this.elevation = 12.0,
     this.globalKey,
-  }) : assert(expandedTitle != null),
+  })  : assert(expandedTitle != null),
         assert(collapsedTitle != null),
         super(key: key);
 
@@ -66,8 +66,7 @@ class _OneUiScrollViewState extends State<OneUiScrollView>
   }
 
   void _snapAppBar(ScrollController controller, double snapOffset) async {
-    if(_scrollAnimate != null)
-      await _scrollAnimate;
+    if (_scrollAnimate != null) await _scrollAnimate;
 
     _scrollAnimate = controller.animateTo(
       snapOffset,
@@ -80,8 +79,8 @@ class _OneUiScrollViewState extends State<OneUiScrollView>
     final scrollViewState = _nestedScrollViewStateKey.currentState;
     final outerController = scrollViewState.outerController;
 
-    if (scrollViewState.innerController.position.pixels == 0
-        && !outerController.position.atEdge) {
+    if (scrollViewState.innerController.position.pixels == 0 &&
+        !outerController.position.atEdge) {
       final range = _expandedHeight - widget.toolbarHeight;
       final snapOffset = (outerController.offset / range) > 0.5 ? range : 0.0;
 
@@ -91,8 +90,8 @@ class _OneUiScrollViewState extends State<OneUiScrollView>
   }
 
   double _calculateExpandRatio(BoxConstraints constraints) {
-    var expandRatio = (constraints.maxHeight - widget.toolbarHeight)
-        / (_expandedHeight - widget.toolbarHeight);
+    var expandRatio = (constraints.maxHeight - widget.toolbarHeight) /
+        (_expandedHeight - widget.toolbarHeight);
 
     if (expandRatio > 1.0) expandRatio = 1.0;
     if (expandRatio < 0.0) expandRatio = 0.0;
@@ -131,8 +130,7 @@ class _OneUiScrollViewState extends State<OneUiScrollView>
   }
 
   Widget _actions() {
-    if(widget.actions == null)
-      return Container();
+    if (widget.actions == null) return Container();
     return Align(
       alignment: Alignment.bottomRight,
       child: Container(
@@ -202,7 +200,7 @@ class _OneUiScrollViewState extends State<OneUiScrollView>
               padding: widget.childrenPadding,
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int i) => widget.children[i],
+                  (BuildContext context, int i) => widget.children[i],
                   childCount: widget.children.length,
                 ),
               ),

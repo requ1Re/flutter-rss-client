@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'one_ui_scroll_simulation.dart';
 
 class OneUiScrollPhysics extends ScrollPhysics {
-
-  OneUiScrollPhysics(
-      this.expandedHeight, {
-        ScrollPhysics parent
-      }) : super(parent: parent);
+  OneUiScrollPhysics(this.expandedHeight, {ScrollPhysics parent})
+      : super(parent: parent);
 
   final double expandedHeight;
 

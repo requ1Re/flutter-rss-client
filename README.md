@@ -3,6 +3,8 @@ A simple RSS Reader made with Flutter
 
 ## Current Features
 - Adding feeds by URL
+- Reordering feeds by dragging
+- Deleting feeds by swiping
 - Viewing feed articles
 - Dark/Light themes
 

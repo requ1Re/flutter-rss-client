@@ -8,6 +8,7 @@ import 'package:flutter_rss_client/types/SavedFeed.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' as Foundation;
 
 class FeedsPage extends StatefulWidget {
   @override
@@ -32,7 +33,7 @@ class _FeedsPageState extends State<FeedsPage> {
       setState(() {
         feeds = savedFeedFromJson(feedsJSON);
       });
-      loadFeedNames();
+      loadFeedData();
     });
   }
 
@@ -44,11 +45,39 @@ class _FeedsPageState extends State<FeedsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // DEV TOOLS
+            Foundation.kDebugMode ? Column(
+              children: [
+                TextButton(
+                  onPressed: (){
+                    SharedPreferences.getInstance().then((s){
+                      s.clear();
+                    });
+                  },
+                  child: Text("[DEV] Clear Data"),
+                )
+              ],
+            ) : Container(),
             Padding(
                 padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
-                child: Text("Subscriptions",
-                    style: TextStyle(
-                        fontSize: 32, color: Theme.of(context).primaryColor)
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text("Subscriptions",
+                        style: TextStyle(
+                            fontSize: 32, color: Theme.of(context).primaryColor
+                        )
+                    ),
+                    IconButton(
+                      onPressed: (){
+                        loadFeeds();
+                        loadFeedData();
+                      },
+                      icon: Icon(Icons.refresh),
+                      color: Theme.of(context).primaryColor,
+                    )
+                  ],
                 )
             ),
             Expanded(
@@ -71,8 +100,8 @@ class _FeedsPageState extends State<FeedsPage> {
                         );
                       },
                       child: ListTile(
-                        title: Text(f.loadedFeed?.title ?? 'Feed #$index'),
-                        subtitle: Text(f.url),
+                        title: Text(f.loadedFeed?.title ?? f.url),
+                        subtitle: f.loadedFeed == null ? null : Text(f.url),
                         trailing: Badge(
                           badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0",
                               style: TextStyle(color: Colors.white)
@@ -201,7 +230,7 @@ class _FeedsPageState extends State<FeedsPage> {
     fixFeedOrder();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("rss_feeds", savedFeedToJson(feeds));
-    loadFeedNames();
+    loadFeedData();
   }
 
   void fixFeedOrder() {
@@ -212,19 +241,17 @@ class _FeedsPageState extends State<FeedsPage> {
     });
   }
 
-  void loadFeedNames() async {
+  void loadFeedData() async {
     for (int i = 0; i < feeds.length; i++) {
       SavedFeed feed = feeds[i];
 
       try {
-        if (feed.loadedFeed == null) {
-          var response = await http.get(Uri.parse(feed.url));
-          if (response.statusCode == 200) {
-            var rssFeed = RssFeed.parse(response.body);
-            setState(() {
-              feed.loadedFeed = rssFeed;
-            });
-          }
+        var response = await http.get(Uri.parse(feed.url));
+        if (response.statusCode == 200) {
+          var rssFeed = RssFeed.parse(response.body);
+          setState(() {
+            feed.loadedFeed = rssFeed;
+          });
         }
       } catch (err) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

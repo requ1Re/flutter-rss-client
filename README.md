@@ -7,9 +7,12 @@ A simple RSS Reader made with Flutter
 - Deleting feeds by swiping
 - Viewing feed articles
 - Dark/Light themes
+- Offline Mode
 
-## Planned Features
-- Offline functionality
+## Planned Features/Changes
+- Improved UI/UX
+- Better reading experience
+- More settings
 
 ## Screenshots
 Taken April 12th, 2021

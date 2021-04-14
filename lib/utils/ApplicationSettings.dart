@@ -55,6 +55,7 @@ class ApplicationSettings with ChangeNotifier {
       prefs.setBool("enableDarkTheme", _darkTheme);
       notifyListeners();
     });
+    print("[DEBUG] Updated Setting: Dark Theme");
   }
 
   void toggleOfflineMode(){
@@ -67,6 +68,7 @@ class ApplicationSettings with ChangeNotifier {
       prefs.setBool("enableOfflineMode", _offlineMode);
       notifyListeners();
     });
+    print("[DEBUG] Updated Setting: Offline Mode");
   }
 
   bool isDarkThemeEnabled() => _darkTheme;

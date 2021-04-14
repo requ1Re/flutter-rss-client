@@ -16,6 +16,12 @@ class _WrapperPageState extends State<WrapperPage> {
   @override
   void initState() {
     super.initState();
+
+    refreshSettings();
+
+    appSettings.addListener(() {
+      refreshSettings();
+    });
   }
 
   void refreshSettings(){
@@ -27,12 +33,6 @@ class _WrapperPageState extends State<WrapperPage> {
 
   @override
   Widget build(BuildContext context) {
-    refreshSettings();
-
-    appSettings.addListener(() {
-      refreshSettings();
-    });
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Flutter RSS Client"),
@@ -89,5 +89,12 @@ class _WrapperPageState extends State<WrapperPage> {
       ),
       body: FeedsPage(),
     );
+  }
+
+  @override
+  void dispose() {
+    appSettings.dispose();
+
+    super.dispose();
   }
 }

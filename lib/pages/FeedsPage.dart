@@ -6,9 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/FeedViewPage.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
+import 'package:flutter_rss_client/utils/ApplicationSettings.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' as Foundation;
 
 class FeedsPage extends StatefulWidget {
@@ -17,25 +17,49 @@ class FeedsPage extends StatefulWidget {
 }
 
 class _FeedsPageState extends State<FeedsPage> {
+  ApplicationSettings appSettings = ApplicationSettings();
+  bool offlineMode = false;
+
   List<SavedFeed> feeds = [];
   final _feedAddController = TextEditingController();
   bool _validationFailed = false;
 
   @override
   void initState() {
-    loadFeeds();
-
     super.initState();
+
+    feedsInit();
   }
 
-  void loadFeeds() {
-    SharedPreferences.getInstance().then((prefs) {
-      String feedsJSON = prefs.getString("rss_feeds") ?? "[]";
-      setState(() {
-        feeds = savedFeedFromJson(feedsJSON);
-      });
-      loadFeedData();
+  void feedsInit() async {
+    refreshSettings();
+    appSettings.addListener(() {
+      refreshSettings();
     });
+
+    await loadFeedsFromDisk();
+    if(!offlineMode){
+      updateAllFeeds();
+    }
+  }
+
+  void refreshSettings(){
+    setState(() {
+      offlineMode = appSettings.isOfflineModeEnabled();
+    });
+  }
+
+  Future<void> loadFeedsFromDisk() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String feedsJSON = prefs.getString("rss_feeds") ?? "[]";
+    feeds = savedFeedFromJson(feedsJSON);
+    if(offlineMode){
+      for(int i = 0; i < feeds.length; i++){
+        SavedFeed feed = feeds[i];
+        feed.loadedFeed = RssFeed.parse(feed.xml);
+      }
+    }
+    setState(() {});
   }
 
   @override
@@ -74,16 +98,17 @@ class _FeedsPageState extends State<FeedsPage> {
                             )
                         ),
                         IconButton(
-                          onPressed: (){
-                            loadFeeds();
-                            loadFeedData();
+                          onPressed: () async {
+                            if(!offlineMode){
+                              await updateAllFeeds();
+                            }
                           },
                           icon: Icon(Icons.refresh),
                           color: Theme.of(context).primaryColor,
                         )
                       ],
                     ),
-                    Text("Swipe left to delete, swipe right to download.")
+                    Text("Swipe to delete")
                   ],
                 )
             ),
@@ -94,20 +119,9 @@ class _FeedsPageState extends State<FeedsPage> {
                   SavedFeed f = feeds[index];
                   return Dismissible(
                       key: f.uniqueKey,
-                      background: slideRightBackground(),
-                      secondaryBackground: slideLeftBackground(),
-                      confirmDismiss: (direction) {
-                        if(direction == DismissDirection.endToStart){
-                          return Future.value(true);
-                        }else{
-                          setState(() {
-                            f.offlineAvailability = !f.offlineAvailability;
-                          });
-                          saveFeeds();
-
-                          return Future.value(false);
-                        }
-                      },
+                      background: Container(
+                        color: Colors.red
+                      ),
                       onDismissed: (direction){
                         setState(() {
                           feeds.removeAt(index);
@@ -122,13 +136,15 @@ class _FeedsPageState extends State<FeedsPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             getLeadingIcon(f),
-                            Padding(
-                              padding: EdgeInsets.only(left: 5),
-                              child: Text(f.name, overflow: TextOverflow.clip),
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Text(f.name, overflow: TextOverflow.clip),
+                              ),
                             )
                           ],
                         ),
-                        subtitle: f.loadedFeed == null ? null : Text(f.url),
+                        subtitle: Text("Last updated: " + f.lastUpdate),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -139,17 +155,26 @@ class _FeedsPageState extends State<FeedsPage> {
                           ],
                         ),
                         onTap: () {
-                          if (f.loadedFeed != null) {
-                            loadFeed(f.loadedFeed);
-                          } else {
+                          if(offlineMode && f.xml == null){
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                    content: Text("Feed is still loading. Please wait.")
+                                    content: Text("This feed is not available in Offline Mode.")
                                 )
                             );
+                          }else{
+                            if (f.loadedFeed != null) {
+                              loadFeed(f.loadedFeed);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text("Feed is still loading. Please wait.")
+                                  )
+                              );
+                            }
                           }
                         },
-                      ));
+                      )
+                  );
                 },
                 onReorder: (int oldIndex, int newIndex) {
                   setState(() {
@@ -167,7 +192,15 @@ class _FeedsPageState extends State<FeedsPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: getActionButton(),
+    );
+  }
+
+  Widget getActionButton(){
+    if(offlineMode){
+      return null;
+    }else{
+      return FloatingActionButton(
         onPressed: () {
           showMaterialModalBottomSheet(
             shape: ContinuousRectangleBorder(
@@ -217,16 +250,17 @@ class _FeedsPageState extends State<FeedsPage> {
                                 if (Uri.parse(_feedAddController.text).isAbsolute) {
                                   setState(() {
                                     SavedFeed _newFeed = new SavedFeed(
-                                      id: feeds.length,
-                                      url: _feedAddController.text,
-                                      name: _feedAddController.text
+                                        id: feeds.length,
+                                        url: _feedAddController.text,
+                                        name: _feedAddController.text
                                     );
                                     feeds.add(_newFeed);
                                     _feedAddController.clear();
                                   });
 
-                                  saveFeeds();
-                                  loadFeedData();
+                                  await saveFeeds();
+                                  await loadFeedsFromDisk();
+                                  await updateAllFeeds();
                                 } else {
                                   _success = false;
                                 }
@@ -247,105 +281,30 @@ class _FeedsPageState extends State<FeedsPage> {
           );
         },
         child: Icon(Icons.add),
-      ),
-    );
+      );
+    }
   }
 
-  Widget slideLeftBackground() {
-    return Container(
-      color: Colors.red,
-      child: Align(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Icon(
-              Icons.delete,
-              color: Colors.white,
-            ),
-            Text(
-              " Delete",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.right,
-            ),
-            SizedBox(
-              width: 20,
-            ),
-          ],
-        ),
-        alignment: Alignment.centerRight,
-      ),
-    );
-  }
-
-  Widget slideRightBackground() {
-    return Container(
-      color: Colors.green,
-      child: Align(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              width: 20,
-            ),
-            Icon(
-              Icons.download_sharp,
-              color: Colors.white,
-            ),
-            Text(
-              " Download",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ],
-        ),
-        alignment: Alignment.centerLeft,
-      ),
-    );
-  }
-
-  void saveFeeds() async {
+  Future<void> saveFeeds() async {
     fixFeedOrder();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("rss_feeds", savedFeedToJson(feeds));
+    print("[DEBUG] Saved feeds to disk");
   }
 
   void fixFeedOrder() {
-    setState(() {
-      for (int i = 0; i < feeds.length; i++) {
-        feeds[i].id = i;
-      }
-    });
+    for (int i = 0; i < feeds.length; i++) {
+      feeds[i].id = i;
+    }
+    setState(() {});
   }
 
-  void loadFeedData() async {
+  Future<void> updateAllFeeds() async {
     for (int i = 0; i < feeds.length; i++) {
       SavedFeed feed = feeds[i];
-
-      try {
-        var response = await http.get(Uri.parse(feed.url));
-        if (response.statusCode == 200) {
-          var rssFeed = RssFeed.parse(response.body);
-          setState(() {
-            feed.name = rssFeed.title;
-            feed.loadedFeed = rssFeed;
-          });
-        }
-      } catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Error while loading Feed #$i: ' + err.toString(),
-                style: TextStyle(color: Colors.white)
-            ),
-            backgroundColor: Colors.red)
-        );
-      }
+      await feed.update(context);
+      setState(() {});
     }
-    saveFeeds();
   }
 
   void loadFeed(RssFeed feed) {
@@ -368,7 +327,23 @@ class _FeedsPageState extends State<FeedsPage> {
   }
 
   Widget getLeadingIcon(SavedFeed f){
-    return f.offlineAvailability ? Icon(Icons.cloud_done, color: Colors.green) : Icon(Icons.cloud_download_outlined, color: Colors.red);
+    return (f.xml == null) ? Icon(Icons.cloud_download_outlined, color: Colors.red) : Icon(Icons.cloud_done, color: Colors.green);
+  }
+
+  Widget getFeedSubtitle(SavedFeed f){
+    if(offlineMode){
+      if(f.xml == null){ // Feed was not saved somehow
+        return null;
+      }else{
+        return Text("Last Updated: " + f.lastUpdate);
+      }
+    }else{
+      if(f.loadedFeed == null){
+        return null;
+      }else{
+        return Text(f.url);
+      }
+    }
   }
 
   Widget buildFeedListViewItem(SavedFeed feed) {
@@ -382,6 +357,8 @@ class _FeedsPageState extends State<FeedsPage> {
   @override
   void dispose() {
     _feedAddController.dispose();
+    appSettings.dispose();
+
     super.dispose();
   }
 }

@@ -15,11 +15,17 @@ class SavedFeed {
   SavedFeed({
     this.id,
     this.url,
+    this.name,
     this.offlineAvailability = false
-  });
+  }){
+   if(this.name == null){
+     this.name = this.url;
+   }
+  }
 
   int id;
   String url;
+  String name;
   RssFeed loadedFeed;
   bool offlineAvailability;
   Key uniqueKey = UniqueKey();
@@ -27,12 +33,14 @@ class SavedFeed {
   factory SavedFeed.fromJson(Map<String, dynamic> json) => SavedFeed(
     id: json["id"],
     url: json["url"],
+    name: json["name"],
     offlineAvailability: json["offlineAvailability"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "url": url,
+    "name": name,
     "offlineAvailability": offlineAvailability,
   };
 }

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:badges/badges.dart';
 import 'package:dart_rss/dart_rss.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/FeedViewPage.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
@@ -60,23 +61,29 @@ class _FeedsPageState extends State<FeedsPage> {
             ) : Container(),
             Padding(
                 padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Subscriptions",
-                        style: TextStyle(
-                            fontSize: 32, color: Theme.of(context).primaryColor
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text("Subscriptions",
+                            style: TextStyle(
+                                fontSize: 32, color: Theme.of(context).primaryColor
+                            )
+                        ),
+                        IconButton(
+                          onPressed: (){
+                            loadFeeds();
+                            loadFeedData();
+                          },
+                          icon: Icon(Icons.refresh),
+                          color: Theme.of(context).primaryColor,
                         )
+                      ],
                     ),
-                    IconButton(
-                      onPressed: (){
-                        loadFeeds();
-                        loadFeedData();
-                      },
-                      icon: Icon(Icons.refresh),
-                      color: Theme.of(context).primaryColor,
-                    )
+                    Text("Swipe left to delete, swipe right to download.")
                   ],
                 )
             ),
@@ -87,28 +94,41 @@ class _FeedsPageState extends State<FeedsPage> {
                   SavedFeed f = feeds[index];
                   return Dismissible(
                       key: f.uniqueKey,
-                      background: Container(color: Colors.red),
-                      onDismissed: (direction) {
+                      background: slideRightBackground(),
+                      secondaryBackground: slideLeftBackground(),
+                      confirmDismiss: (direction) {
+                        if(direction == DismissDirection.endToStart){
+                          return Future.value(true);
+                        }else{
+                          setState(() {
+                            f.offlineAvailability = !f.offlineAvailability;
+                          });
+                          saveFeeds();
+
+                          return Future.value(false);
+                        }
+                      },
+                      onDismissed: (direction){
                         setState(() {
                           feeds.removeAt(index);
                         });
                         fixFeedOrder();
                         saveFeeds();
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Feed has been removed"))
-                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Feed has been removed")));
                       },
                       child: ListTile(
-                        title: Text(f.loadedFeed?.title ?? f.url),
-                        subtitle: f.loadedFeed == null ? null : Text(f.url),
-                        horizontalTitleGap: 0,
-                        leading: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        title: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            getOfflineAvailabilityIcon(f)
+                            getLeadingIcon(f),
+                            Padding(
+                              padding: EdgeInsets.only(left: 5),
+                              child: Text(f.name, overflow: TextOverflow.clip),
+                            )
                           ],
                         ),
+                        subtitle: f.loadedFeed == null ? null : Text(f.url),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -179,9 +199,8 @@ class _FeedsPageState extends State<FeedsPage> {
                                 border: OutlineInputBorder(),
                                 labelText: "Add Feed",
                                 hintText: "Feed URL",
-                                errorText: _validationFailed
-                                    ? "Please enter an URL."
-                                    : null),
+                                errorText: _validationFailed ? "Please enter an URL." : null
+                            ),
                             onChanged: (str) {
                               setState(() {
                                 _validationFailed = false;
@@ -195,17 +214,19 @@ class _FeedsPageState extends State<FeedsPage> {
                             onPressed: () async {
                               bool _success = true;
                               if (_feedAddController.text.length > 0) {
-                                if (Uri.parse(_feedAddController.text)
-                                    .isAbsolute) {
+                                if (Uri.parse(_feedAddController.text).isAbsolute) {
                                   setState(() {
                                     SavedFeed _newFeed = new SavedFeed(
-                                        id: feeds.length,
-                                        url: _feedAddController.text);
+                                      id: feeds.length,
+                                      url: _feedAddController.text,
+                                      name: _feedAddController.text
+                                    );
                                     feeds.add(_newFeed);
                                     _feedAddController.clear();
                                   });
 
                                   saveFeeds();
+                                  loadFeedData();
                                 } else {
                                   _success = false;
                                 }
@@ -230,11 +251,68 @@ class _FeedsPageState extends State<FeedsPage> {
     );
   }
 
+  Widget slideLeftBackground() {
+    return Container(
+      color: Colors.red,
+      child: Align(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+            Text(
+              " Delete",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.right,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+          ],
+        ),
+        alignment: Alignment.centerRight,
+      ),
+    );
+  }
+
+  Widget slideRightBackground() {
+    return Container(
+      color: Colors.green,
+      child: Align(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              width: 20,
+            ),
+            Icon(
+              Icons.download_sharp,
+              color: Colors.white,
+            ),
+            Text(
+              " Download",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ],
+        ),
+        alignment: Alignment.centerLeft,
+      ),
+    );
+  }
+
   void saveFeeds() async {
     fixFeedOrder();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("rss_feeds", savedFeedToJson(feeds));
-    loadFeedData();
   }
 
   void fixFeedOrder() {
@@ -254,16 +332,20 @@ class _FeedsPageState extends State<FeedsPage> {
         if (response.statusCode == 200) {
           var rssFeed = RssFeed.parse(response.body);
           setState(() {
+            feed.name = rssFeed.title;
             feed.loadedFeed = rssFeed;
           });
         }
       } catch (err) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Error while loading Feed #$i: ' + err.toString(),
-                style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.red));
+                style: TextStyle(color: Colors.white)
+            ),
+            backgroundColor: Colors.red)
+        );
       }
     }
+    saveFeeds();
   }
 
   void loadFeed(RssFeed feed) {
@@ -285,14 +367,8 @@ class _FeedsPageState extends State<FeedsPage> {
     );
   }
 
-  Widget getOfflineAvailabilityIcon(SavedFeed f){
+  Widget getLeadingIcon(SavedFeed f){
     return f.offlineAvailability ? Icon(Icons.cloud_done, color: Colors.green) : Icon(Icons.cloud_download_outlined, color: Colors.red);
-  }
-
-  @override
-  void dispose() {
-    _feedAddController.dispose();
-    super.dispose();
   }
 
   Widget buildFeedListViewItem(SavedFeed feed) {
@@ -301,5 +377,11 @@ class _FeedsPageState extends State<FeedsPage> {
       height: 50,
       child: Center(child: Text(feed.url)),
     );
+  }
+
+  @override
+  void dispose() {
+    _feedAddController.dispose();
+    super.dispose();
   }
 }

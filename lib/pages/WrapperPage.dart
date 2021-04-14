@@ -3,12 +3,12 @@ import 'package:flutter_rss_client/pages/FeedsPage.dart';
 import 'package:flutter_rss_client/utils/ApplicationSettings.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-class HomePage extends StatefulWidget {
+class WrapperPage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _WrapperPageState createState() => _WrapperPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _WrapperPageState extends State<WrapperPage> {
   ApplicationSettings appSettings = ApplicationSettings();
   bool darkTheme = false;
   bool offlineMode = false;

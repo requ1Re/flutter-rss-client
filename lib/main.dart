@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rss_client/pages/HomePage.dart';
+import 'package:flutter_rss_client/pages/WrapperPage.dart';
 import 'package:flutter_rss_client/utils/ApplicationSettings.dart';
 
 void main() {
@@ -28,7 +28,7 @@ class _FlutterRSSClientState extends State<FlutterRSSClient> {
     return MaterialApp(
       title: 'Flutter RSS Client',
       theme: appSettings.currentTheme(),
-      home: HomePage(),
+      home: WrapperPage(),
     );
   }
 }

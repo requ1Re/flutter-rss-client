@@ -68,7 +68,7 @@ class _FeedViewPageState extends State<FeedViewPage> {
     }
     if (item.pubDate != null) {
       _card.add(Divider());
-      _card.add(Text("Published " + DateFormat().format(DateTime.parse(item.pubDate)), style: TextStyle(color: Theme.of(context).primaryColor)));
+      _card.add(Text("Published " + item.pubDate, style: TextStyle(color: Theme.of(context).primaryColor)));
       hasOnlyTitle = false;
     }
     _card.insert(0, Text(item.title, style: hasOnlyTitle ? null : TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)));

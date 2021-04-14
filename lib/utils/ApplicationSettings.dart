@@ -36,6 +36,7 @@ class ApplicationSettings with ChangeNotifier {
     SharedPreferences.getInstance().then((prefs) {
       _darkTheme = prefs.getBool("enableDarkTheme") ?? _darkTheme;
       _offlineMode = prefs.getBool("enableOfflineMode") ?? _offlineMode;
+      notifyListeners();
     });
   }
 

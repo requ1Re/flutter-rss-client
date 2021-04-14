@@ -113,9 +113,7 @@ class _FeedsPageState extends State<FeedsPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Badge(
-                              badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0",
-                                  style: TextStyle(color: Colors.white)
-                              ),
+                              badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0", style: TextStyle(color: Colors.white)),
                               badgeColor: Theme.of(context).primaryColor,
                             )
                           ],
@@ -123,12 +121,6 @@ class _FeedsPageState extends State<FeedsPage> {
                         onTap: () {
                           if (f.loadedFeed != null) {
                             loadFeed(f.loadedFeed);
-                            /*
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => screen),
-                            );
-                             */
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

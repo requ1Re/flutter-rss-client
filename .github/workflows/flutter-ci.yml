@@ -4,8 +4,8 @@ name: Flutter CI
 
 on:
   push:
-    branches:
-    - main
+    tags:
+      - 'v*.*.*'
     
 # on: push    # Default will running for every branch.
     
@@ -32,10 +32,14 @@ jobs:
 
     # Statically analyze the Dart code for any errors.
     - run: flutter analyze .
+    
+    # Build apk.
+    - run: flutter build apk
 
     # Release
     - uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: build/app/outputs/apk/release/app-release.apk
+        files: 'build/app/outputs/apk/release/app-release.apk'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

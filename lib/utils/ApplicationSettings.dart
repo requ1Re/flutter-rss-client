@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AppTheme with ChangeNotifier {
+class ApplicationSettings with ChangeNotifier {
   static Color primaryColor = Color.fromRGBO(72, 52, 212, 1);
   static Color primaryColorDark = Color.fromRGBO(110, 89, 255, 1.0);
   static Color accentColor = primaryColor;
@@ -24,26 +24,53 @@ class AppTheme with ChangeNotifier {
   static ThemeData customThemeDark = _customThemeDark.copyWith(
       textTheme: GoogleFonts.montserratTextTheme(_customThemeDark.textTheme));
 
-  static bool _isDark = true;
 
-  AppTheme() {
+  // Settings
+  static bool _darkTheme = true;
+  static bool _offlineMode = false;
+
+  static final ApplicationSettings _instance = ApplicationSettings._internal();
+  factory ApplicationSettings() => _instance;
+
+  ApplicationSettings._internal() {
     SharedPreferences.getInstance().then((prefs) {
-      _isDark = prefs.getBool("enableDarkTheme") ?? true;
+      _darkTheme = prefs.getBool("enableDarkTheme") ?? _darkTheme;
+      _offlineMode = prefs.getBool("enableOfflineMode") ?? _offlineMode;
       notifyListeners();
     });
   }
 
+
   ThemeData currentTheme() {
-    return _isDark ? customThemeDark : customThemeLight;
+    return _darkTheme ? customThemeDark : customThemeLight;
   }
 
-  void switchTheme() {
-    _isDark = !_isDark;
+  void toggleDarkTheme() {
+    setEnableDarkMode(!_darkTheme);
+  }
+
+  void setEnableDarkMode(bool enableDarkMode){
+    _darkTheme = enableDarkMode;
     SharedPreferences.getInstance().then((prefs) {
-      prefs.setBool("enableDarkTheme", _isDark);
+      prefs.setBool("enableDarkTheme", _darkTheme);
+      notifyListeners();
     });
-    notifyListeners();
+    print("[DEBUG] Updated Setting: Dark Theme");
   }
 
-  bool isDark() => _isDark;
+  void toggleOfflineMode(){
+    setEnableOfflineMode(!_offlineMode);
+  }
+
+  void setEnableOfflineMode(bool enableOfflineMode){
+    _offlineMode = enableOfflineMode;
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool("enableOfflineMode", _offlineMode);
+      notifyListeners();
+    });
+    print("[DEBUG] Updated Setting: Offline Mode");
+  }
+
+  bool isDarkThemeEnabled() => _darkTheme;
+  bool isOfflineModeEnabled() => _offlineMode;
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rss_client/pages/FeedsPage.dart';
-import 'package:flutter_rss_client/utils/AppTheme.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_rss_client/pages/WrapperPage.dart';
+import 'package:flutter_rss_client/utils/ApplicationSettings.dart';
 
 void main() {
   runApp(FlutterRSSClient());
@@ -14,12 +13,12 @@ class FlutterRSSClient extends StatefulWidget {
 }
 
 class _FlutterRSSClientState extends State<FlutterRSSClient> {
-  AppTheme theme = AppTheme();
+  ApplicationSettings appSettings = ApplicationSettings();
 
   @override
   void initState() {
     super.initState();
-    theme.addListener(() {
+    appSettings.addListener(() {
       setState(() {});
     });
   }
@@ -28,23 +27,8 @@ class _FlutterRSSClientState extends State<FlutterRSSClient> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter RSS Client',
-      theme: theme.currentTheme(),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("Flutter RSS Client"),
-          elevation: 10,
-          brightness: Brightness.dark,
-          actions: [
-            IconButton(
-                icon: theme.isDark()
-                    ? FaIcon(FontAwesomeIcons.solidSun)
-                    : FaIcon(FontAwesomeIcons.solidMoon),
-                onPressed: () => theme.switchTheme()
-            )
-          ],
-        ),
-        body: FeedsPage(),
-      ),
+      theme: appSettings.currentTheme(),
+      home: WrapperPage(),
     );
   }
 }

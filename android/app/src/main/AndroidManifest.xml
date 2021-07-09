@@ -2,8 +2,8 @@
     package="dev.patricklist.flutter_rss_client">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="flutter_rss_client"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Flutter RSS Client"
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

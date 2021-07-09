@@ -1,8 +1,8 @@
 # Flutter RSS Client
-A simple cross-plattform mobile RSS Reader made with Flutter.
+A simple mobile RSS Reader made with Flutter.
 
 ### Current Features
-- Easy control over your feeds (Adding, removing, reodering)
+- Easy control over your feeds (Adding, removing, reordering)
 - Viewing feed articles
 - Dark/Light themes
 - Offline Mode

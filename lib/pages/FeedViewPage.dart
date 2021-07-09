@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:dart_rss/dart_rss.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_rss_client/pages/ArticleViewPage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FeedViewPage extends StatefulWidget {
@@ -30,12 +31,16 @@ class _FeedViewPageState extends State<FeedViewPage> {
                 padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                 child: Card(
                   shape: ContinuousRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(25))),
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 5,
                   child: InkWell(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: BorderRadius.circular(16),
                     onTap: () async {
-                      await launch(item.link);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ArticleViewPage(item: item, feed: widget.feed)),
+                      );
+                      //await launch(item.link);
                     },
                     child: Padding(
                       padding: EdgeInsets.all(10),
@@ -54,23 +59,10 @@ class _FeedViewPageState extends State<FeedViewPage> {
 
   List<Widget> buildFeedCard(RssItem item) {
     List<Widget> _card = [];
-
-    bool hasOnlyTitle = true;
-    if (item.description != null) {
-      _card.add(Divider());
-      _card.add(Html(
-          data: item.description,
-          onLinkTap: (link) async {
-            await launch(link);
-          }));
-      hasOnlyTitle = false;
-    }
     if (item.pubDate != null) {
-      _card.add(Divider());
       _card.add(Text("Published " + item.pubDate, style: TextStyle(color: Theme.of(context).primaryColor)));
-      hasOnlyTitle = false;
     }
-    _card.insert(0, Text(item.title, style: hasOnlyTitle ? null : TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)));
+    _card.insert(0, Text(item.title, style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)));
 
     return _card;
   }

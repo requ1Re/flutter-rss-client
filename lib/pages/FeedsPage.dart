@@ -70,19 +70,6 @@ class _FeedsPageState extends State<FeedsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // DEV TOOLS
-            Foundation.kDebugMode ? Column(
-              children: [
-                TextButton(
-                  onPressed: (){
-                    SharedPreferences.getInstance().then((s){
-                      s.clear();
-                    });
-                  },
-                  child: Text("[DEV] Clear Data"),
-                )
-              ],
-            ) : Container(),
             Padding(
                 padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
                 child: Column(
@@ -189,6 +176,19 @@ class _FeedsPageState extends State<FeedsPage> {
                 },
               ),
             ),
+            // DEV TOOLS
+            Foundation.kDebugMode ? Column(
+              children: [
+                TextButton(
+                  onPressed: (){
+                    SharedPreferences.getInstance().then((s){
+                      s.clear();
+                    });
+                  },
+                  child: Text("[DEV] Clear Data"),
+                )
+              ],
+            ) : Container()
           ],
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/WrapperPage.dart';
 import 'package:flutter_rss_client/utils/ApplicationSettings.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 
 void main() {
   runApp(FlutterRSSClient());

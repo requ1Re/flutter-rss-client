@@ -11,18 +11,30 @@ class ApplicationSettings with ChangeNotifier {
       brightness: Brightness.light,
       canvasColor: Color.fromRGBO(242, 243, 248, 1),
       primaryColor: primaryColor,
-      accentColor: accentColor);
+      accentColor: accentColor,
+      textTheme: TextTheme(
+        bodyText2: TextStyle(color: Colors.grey[800]),
+        subtitle1: TextStyle(color: Colors.black)
+      )
+  );
   static ThemeData customThemeLight = _customThemeLight.copyWith(
-      textTheme: GoogleFonts.montserratTextTheme(_customThemeLight.textTheme));
+      textTheme: GoogleFonts.montserratTextTheme(_customThemeLight.textTheme)
+  );
 
   static ThemeData _customThemeDark = ThemeData(
       brightness: Brightness.dark,
-      canvasColor: Colors.black,
+      canvasColor: Color(0xFF2e2f36),
       cardColor: Color.fromRGBO(20, 20, 20, 1),
       primaryColor: primaryColorDark,
-      accentColor: primaryColorDark);
+      accentColor: primaryColorDark,
+      textTheme: TextTheme(
+        bodyText2: TextStyle(color: Color(0xFF8185a3)),
+        subtitle1: TextStyle(color: Colors.white)
+      )
+  );
   static ThemeData customThemeDark = _customThemeDark.copyWith(
-      textTheme: GoogleFonts.montserratTextTheme(_customThemeDark.textTheme));
+      textTheme: GoogleFonts.montserratTextTheme(_customThemeDark.textTheme)
+  );
 
 
   // Settings

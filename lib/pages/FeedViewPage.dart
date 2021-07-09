@@ -77,7 +77,10 @@ class _FeedViewPageState extends State<FeedViewPage> {
                             },
                             contentPadding: EdgeInsets.zero,
                             title: Text(widget.feed.items[i].title),
-                            subtitle: widget.feed.items[i].pubDate != null ? Text(Jiffy(widget.feed.items[i].pubDate, "E, dd MMM yyyy HH:mm:ss zzz").yMMMMEEEEdjm) : null,
+                            subtitle: widget.feed.items[i].pubDate != null 
+                              ? Text(Jiffy(widget.feed.items[i].pubDate, "E, dd MMM yyyy HH:mm:ss zzz").yMMMMEEEEdjm, 
+                                  style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color)
+                              ) : null,
                             trailing: widget.feed.items[i].content.images.isNotEmpty ? Image.network(widget.feed.items[i].content.images.first, fit: BoxFit.cover, width: 100) : null,
                           ),
                         )

@@ -5,6 +5,7 @@ import 'package:dart_rss/dart_rss.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/pages/FeedViewPage.dart';
+import 'package:flutter_rss_client/pages/SettingsPage.dart';
 import 'package:flutter_rss_client/types/SavedFeed.dart';
 import 'package:flutter_rss_client/utils/ApplicationSettings.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -71,33 +72,56 @@ class _FeedsPageState extends State<FeedsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-                padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("Subscriptions",
-                            style: TextStyle(
-                                fontSize: 32, color: Theme.of(context).primaryColor
-                            )
-                        ),
-                        IconButton(
-                          onPressed: () async {
-                            if(!offlineMode){
-                              await updateAllFeeds();
-                            }
-                          },
-                          icon: Icon(Icons.refresh),
-                          color: Theme.of(context).primaryColor,
-                        )
-                      ],
-                    ),
-                    Text("Swipe to delete")
-                  ],
-                )
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Flutter RSS Client", style: TextStyle(fontSize: 16)),
+                  Spacer(),
+                  IconButton(
+                    onPressed: () async {
+                      if(!offlineMode){
+                        await updateAllFeeds();
+                      }
+                    },
+                    icon: Icon(
+                      Icons.refresh, 
+                      color: Theme.of(context).textTheme.bodyText2.color
+                    )
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SettingsPage()),
+                      );
+                    },
+                    icon: Icon(
+                      Icons.settings, 
+                      color: Theme.of(context).textTheme.bodyText2.color
+                    )
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16, bottom: 32, left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Subscriptions", 
+                    style: TextStyle(
+                      fontSize: 32, 
+                      color: Theme.of(context).textTheme.subtitle1.color
+                    )
+                  ),
+                  Text("Swipe to delete", 
+                    style: TextStyle(
+                      fontSize: 18
+                    )
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: ReorderableListView.builder(
@@ -131,13 +155,13 @@ class _FeedsPageState extends State<FeedsPage> {
                             )
                           ],
                         ),
-                        subtitle: Text("Last updated: " + f.lastUpdate),
+                        subtitle: Text("Last updated: " + f.lastUpdate, style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color)),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Badge(
                               badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0", style: TextStyle(color: Colors.white)),
-                              badgeColor: Theme.of(context).primaryColor,
+                              badgeColor: Color(0xFF8185a3),
                             )
                           ],
                         ),
@@ -201,6 +225,7 @@ class _FeedsPageState extends State<FeedsPage> {
       return null;
     }else{
       return FloatingActionButton(
+        backgroundColor: Color(0xFF959abd),
         onPressed: () {
           showMaterialModalBottomSheet(
             shape: ContinuousRectangleBorder(

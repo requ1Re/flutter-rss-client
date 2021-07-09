@@ -8,7 +8,6 @@ A simple mobile RSS Reader made with Flutter.
 - Offline Mode
 
 ### Planned Features/Changes
-- Improved UI/UX
 - Better reading experience
 - Configurable push notifications
 - Configurable refreshing of feeds in the background
@@ -16,10 +15,10 @@ A simple mobile RSS Reader made with Flutter.
 
 ---
 ### Screenshots
-Last update: April 12th, 2021 (not up-to-date, getting replaced soon)
+Last update: July 9th, 2021 (App Version 0.3.1)
 
 #### Light Theme
-<img src="https://i.irq.pw/u/18.42.21-12.04.21.jpg" width="225px" /> <img src="https://i.irq.pw/u/18.43.40-12.04.21.jpg" width="225px" />
+<img src="https://i.imgur.com/JO1nQvZ.jpg" width="225px" /> <img src="https://i.imgur.com/deJxac9.jpg" width="225px" /> <img src="https://i.imgur.com/KN9NzUq.jpg" width="225px" />
 
 #### Dark Theme
-<img src="https://i.irq.pw/u/19.24.23-12.04.21.jpg" width="225px" /> <img src="https://i.irq.pw/u/19.24.31-12.04.21.jpg" width="225px" />
+<img src="https://i.imgur.com/SUlhvHr.jpg" width="225px" /> <img src="https://i.imgur.com/BFXKxRO.jpg" width="225px" /> <img src="https://i.imgur.com/NpAHoWt.jpg" width="225px" />

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/style.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ArticleViewPage extends StatefulWidget {
@@ -30,6 +31,7 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
               color: Theme.of(context).canvasColor
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                     padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding / 2),
@@ -77,6 +79,11 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
                     padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding),
                     child: _createChips(widget.item.categories),
                   ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: widget.item.pubDate != null ? Text(Jiffy(widget.item.pubDate, "E, dd MMM yyyy HH:mm:ss zzz").yMMMMEEEEdjm.toUpperCase()) : null,
+                  ),
+                  Divider(indent: horizontalPadding, endIndent: horizontalPadding, thickness: 2),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                     child: Text(widget.item.title, style: TextStyle(fontSize: 26, color: Theme.of(context).textTheme.bodyText1.color, decoration: TextDecoration.none)),

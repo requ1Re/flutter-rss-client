@@ -22,7 +22,7 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Color(0xFF2e2f36),
+      color: Theme.of(context).canvasColor,
       child: SafeArea(
         child: SingleChildScrollView(
           child: Container(

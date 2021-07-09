@@ -28,7 +28,7 @@ class ApplicationSettings with ChangeNotifier {
       primaryColor: primaryColorDark,
       accentColor: primaryColorDark,
       textTheme: TextTheme(
-        bodyText2: TextStyle(color: Color(0xFF8185a3)),
+        bodyText2: TextStyle(color: Color(0xFF959abd)),
         subtitle1: TextStyle(color: Colors.white)
       )
   );

@@ -15,10 +15,11 @@ class ArticleViewPage extends StatefulWidget {
 }
 
 class _ArticleViewPageState extends State<ArticleViewPage> {
+  final double horizontalPadding = 16;
+  final double verticalPadding = 16;
+
   @override
   Widget build(BuildContext context) {
-    bool showImage = false;
-
     return Material(
       color: Color(0xFF2e2f36),
       child: SafeArea(
@@ -31,76 +32,75 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
             child: Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            GestureDetector(
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.chevron_left,
-                                    size: 32,
-                                    color: Theme.of(context).textTheme.bodyText2.color,
-                                  ),
-                                  Text(widget.feed.title, style: TextStyle(fontSize: 16))
-                                ],
+                    padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding / 2),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.chevron_left,
+                                size: 32,
+                                color: Theme.of(context).textTheme.bodyText2.color,
                               ),
-                              onTap: () => {
-                                Navigator.pop(context)
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      widget.item.content.images.isNotEmpty ? Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x54000000),
-                              spreadRadius: 4,
-                              blurRadius: 20,
-                            ),
-                          ]
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.network(widget.item.content.images.first),
-                        ),
-                      ): Container(),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: _createChips(widget.item.categories),
-                      ),
-                      Text(widget.item.title, style: TextStyle(fontSize: 26, color: Theme.of(context).textTheme.bodyText1.color, decoration: TextDecoration.none)),
-                      Padding(
-                        padding: EdgeInsets.only(top: 16),
-                        child: Html(
-                          style: {
-                            "*": Style(
-                              color: Theme.of(context).textTheme.bodyText2.color, 
-                              fontSize: FontSize.large, 
-                              padding: EdgeInsets.symmetric(vertical: 8), 
-                              margin: EdgeInsets.zero
-                            ),
-                            "a": Style(color: Theme.of(context).textTheme.subtitle1.color)
+                              Text(widget.feed.title, style: TextStyle(fontSize: 16))
+                            ],
+                          ),
+                          onTap: () => {
+                            Navigator.pop(context)
                           },
-                          data: widget.item.description,
-                          onLinkTap: (link) async {
-                            await launch(link);
-                          }
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                  widget.item.content.images.isNotEmpty ? Padding(
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x54000000),
+                            spreadRadius: 4,
+                            blurRadius: 20,
+                          ),
+                        ]
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.network(widget.item.content.images.first),
+                      ),
+                    ),
+                  ): Container(),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: horizontalPadding),
+                    child: _createChips(widget.item.categories),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: Text(widget.item.title, style: TextStyle(fontSize: 26, color: Theme.of(context).textTheme.bodyText1.color, decoration: TextDecoration.none)),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: verticalPadding, left: horizontalPadding, right: horizontalPadding),
+                    child: Html(
+                      style: {
+                        "*": Style(
+                          color: Theme.of(context).textTheme.bodyText2.color, 
+                          fontSize: FontSize.large, 
+                          padding: EdgeInsets.symmetric(vertical: verticalPadding / 2), 
+                          margin: EdgeInsets.zero
+                        ),
+                        "a": Style(color: Theme.of(context).textTheme.subtitle1.color)
+                      },
+                      data: widget.item.description,
+                      onLinkTap: (link) async {
+                        await launch(link);
+                      }
+                    ),
+                  ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 50),

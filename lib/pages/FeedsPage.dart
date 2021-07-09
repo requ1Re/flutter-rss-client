@@ -308,21 +308,9 @@ class _FeedsPageState extends State<FeedsPage> {
   }
 
   void loadFeed(RssFeed feed) {
-    showMaterialModalBottomSheet(
-      shape: ContinuousRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(25), topRight: Radius.circular(25)
-          )
-      ),
-      useRootNavigator: true,
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return FeedViewPage(feed: feed);
-          },
-        );
-      },
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FeedViewPage(feed: feed)),
     );
   }
 

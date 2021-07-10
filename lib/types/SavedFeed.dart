@@ -16,15 +16,12 @@ String savedFeedToJson(List<SavedFeed> data) => json.encode(List<dynamic>.from(d
 
 class SavedFeed {
   SavedFeed({
-    this.id,
-    this.url,
-    this.name,
+    required this.id,
+    required this.url,
+    required this.name,
     this.lastUpdate,
     this.xml
   }){
-   if(this.name == null){
-     this.name = this.url;
-   }
    if(this.lastUpdate == null){
      updateDate();
    }
@@ -33,9 +30,9 @@ class SavedFeed {
   int id;
   String url;
   String name;
-  RssFeed loadedFeed;
-  String lastUpdate;
-  String xml;
+  RssFeed? loadedFeed;
+  String? lastUpdate;
+  String? xml;
 
   Key uniqueKey = UniqueKey();
 
@@ -60,7 +57,7 @@ class SavedFeed {
       var response = await http.get(Uri.parse(this.url));
       if (response.statusCode == 200) {
         var rssFeed = RssFeed.parse(response.body);
-        this.name = rssFeed.title;
+        this.name = rssFeed.title ?? "Unknown";
         this.loadedFeed = rssFeed;
         this.xml = response.body;
       }

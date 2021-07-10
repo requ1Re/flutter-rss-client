@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rss_client/utils/ApplicationSettings.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({ Key key }) : super(key: key);
+  const SettingsPage({ Key? key }) : super(key: key);
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -52,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           Icon(
                             Icons.chevron_left,
                             size: 32,
-                            color: Theme.of(context).textTheme.bodyText2.color,
+                            color: Theme.of(context).textTheme.bodyText2?.color,
                           ),
                           Text("Dashboard", style: TextStyle(fontSize: 16))
                         ],
@@ -69,7 +69,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Text("Settings", 
                   style: TextStyle(
                     fontSize: 32, 
-                    color: Theme.of(context).textTheme.subtitle1.color
+                    color: Theme.of(context).textTheme.subtitle1?.color
                   )
                 ),
               ),

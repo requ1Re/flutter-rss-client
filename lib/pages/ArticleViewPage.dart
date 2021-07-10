@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 class ArticleViewPage extends StatefulWidget {
   final RssItem item;
   final RssFeed feed;
-  const ArticleViewPage({ Key key, this.item, this.feed }) : super(key: key);
+  const ArticleViewPage({ Key? key, required this.item, required this.feed }) : super(key: key);
 
   @override
   _ArticleViewPageState createState() => _ArticleViewPageState();
@@ -44,9 +44,9 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
                               Icon(
                                 Icons.chevron_left,
                                 size: 32,
-                                color: Theme.of(context).textTheme.bodyText2.color,
+                                color: Theme.of(context).textTheme.bodyText2?.color,
                               ),
-                              Text(widget.feed.title, style: TextStyle(fontSize: 16))
+                              Text(widget.feed.title ?? "?", style: TextStyle(fontSize: 16))
                             ],
                           ),
                           onTap: () => {
@@ -56,22 +56,24 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
                       ],
                     ),
                   ),
-                  widget.item.content.images.isNotEmpty ? Padding(
+                  widget.item.content?.images != null ? Padding(
                     padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x54000000),
-                            spreadRadius: 4,
-                            blurRadius: 20,
-                          ),
-                        ]
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.network(widget.item.content.images.first),
+                    child: Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0x54000000),
+                              spreadRadius: 4,
+                              blurRadius: 20,
+                            ),
+                          ]
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.network((widget.item.content)!.images.first),
+                        ),
                       ),
                     ),
                   ): Container(),
@@ -86,23 +88,26 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
                   Divider(indent: horizontalPadding, endIndent: horizontalPadding, thickness: 2),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    child: Text(widget.item.title, style: TextStyle(fontSize: 26, color: Theme.of(context).textTheme.bodyText1.color, decoration: TextDecoration.none)),
+                    child: Text(widget.item.title ?? "?", style: TextStyle(fontSize: 26, color: Theme.of(context).textTheme.bodyText1?.color, decoration: TextDecoration.none)),
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: verticalPadding, left: horizontalPadding, right: horizontalPadding),
                     child: Html(
                       style: {
                         "*": Style(
-                          color: Theme.of(context).textTheme.bodyText2.color, 
+                          color: Theme.of(context).textTheme.bodyText2?.color, 
                           fontSize: FontSize.large, 
                           padding: EdgeInsets.symmetric(vertical: verticalPadding / 2), 
                           margin: EdgeInsets.zero
                         ),
-                        "a": Style(color: Theme.of(context).textTheme.subtitle1.color)
+                        "a": Style(color: Theme.of(context).textTheme.subtitle1?.color),
+                        "table": Style(
+                          display: Display.NONE
+                        )
                       },
-                      data: widget.item.description,
-                      onLinkTap: (link) async {
-                        await launch(link);
+                      data: widget.item.content?.value != null ? (widget.item.content!).value : widget.item.description,
+                      onLinkTap: (url, context, attributes, element) {
+                        launch(url!);
                       }
                     ),
                   ),
@@ -115,7 +120,7 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
                       textStyle: TextStyle(color: Colors.white),
                     ),
                     onPressed: () async {
-                      await launch(widget.item.link);
+                      await launch(widget.item.link ?? "");
                     }, 
                     icon: Icon(Icons.open_in_browser), 
                     label: Text("OPEN ARTICLE IN BROWSER")
@@ -134,7 +139,7 @@ class _ArticleViewPageState extends State<ArticleViewPage> {
         alignment: Alignment.centerLeft,
         child: Wrap(
           spacing: 8, 
-          children: categories.map((e) => new Chip(label: Text(e.value, style: TextStyle(color: Colors.white)), 
+          children: categories.map((e) => new Chip(label: Text(e.value ?? "?", style: TextStyle(color: Colors.white)), 
           backgroundColor: Color(0xFF8185a3))).toList()
         ),
       );

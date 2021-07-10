@@ -6,7 +6,7 @@ import 'package:jiffy/jiffy.dart';
 class FeedViewPage extends StatefulWidget {
   final RssFeed feed;
 
-  const FeedViewPage({Key key, this.feed}) : super(key: key);
+  const FeedViewPage({Key? key, required this.feed}) : super(key: key);
 
   @override
   _FeedViewPageState createState() => _FeedViewPageState();
@@ -31,7 +31,7 @@ class _FeedViewPageState extends State<FeedViewPage> {
                           Icon(
                             Icons.chevron_left,
                             size: 32,
-                            color: Theme.of(context).textTheme.bodyText2.color,
+                            color: Theme.of(context).textTheme.bodyText2?.color,
                           ),
                           Text("Dashboard", style: TextStyle(fontSize: 16))
                         ],
@@ -51,10 +51,10 @@ class _FeedViewPageState extends State<FeedViewPage> {
                     Text("Latest news", 
                       style: TextStyle(
                         fontSize: 32, 
-                        color: Theme.of(context).textTheme.subtitle1.color
+                        color: Theme.of(context).textTheme.subtitle1?.color
                       )
                     ),
-                    Text(widget.feed.title, 
+                    Text(widget.feed.title ?? "?", 
                       style: TextStyle(
                         fontSize: 18,
                       )
@@ -76,12 +76,12 @@ class _FeedViewPageState extends State<FeedViewPage> {
                               )
                             },
                             contentPadding: EdgeInsets.zero,
-                            title: Text(widget.feed.items[i].title),
+                            title: Text(widget.feed.items[i].title ?? "?"),
                             subtitle: widget.feed.items[i].pubDate != null 
                               ? Text(Jiffy(widget.feed.items[i].pubDate, "E, dd MMM yyyy HH:mm:ss zzz").yMMMMEEEEdjm, 
-                                  style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color)
+                                  style: TextStyle(color: Theme.of(context).textTheme.bodyText2?.color)
                               ) : null,
-                            trailing: widget.feed.items[i].content.images.isNotEmpty ? Image.network(widget.feed.items[i].content.images.first, fit: BoxFit.cover, width: 100) : null,
+                            trailing: _showArticleImage(widget.feed.items[i]),
                           ),
                         )
                   ],
@@ -96,10 +96,24 @@ class _FeedViewPageState extends State<FeedViewPage> {
   List<Widget> buildFeedCard(RssItem item) {
     List<Widget> _card = [];
     if (item.pubDate != null) {
-      _card.add(Text("Published " + item.pubDate, style: TextStyle(color: Theme.of(context).primaryColor)));
+      _card.add(Text("Published " + (item.pubDate)!, style: TextStyle(color: Theme.of(context).primaryColor)));
     }
-    _card.insert(0, Text(item.title, style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)));
+    _card.insert(0, Text(item.title ?? "?", style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)));
 
     return _card;
+  }
+
+  Widget _showArticleImage(RssItem item){
+    if(item.content != null){
+      Iterable<String> images = [];
+      images = (item.content)!.images;
+      if((images.length) > 0){
+        if(images.first.isNotEmpty){
+          return Image.network(images.first, width: 100, fit: BoxFit.cover);
+        }
+      }
+    }
+
+    return SizedBox(width: 0);
   }
 }

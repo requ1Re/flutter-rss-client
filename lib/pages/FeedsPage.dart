@@ -57,7 +57,9 @@ class _FeedsPageState extends State<FeedsPage> {
     if(offlineMode){
       for(int i = 0; i < feeds.length; i++){
         SavedFeed feed = feeds[i];
-        feed.loadedFeed = RssFeed.parse(feed.xml);
+        if(feed.xml != null){
+          feed.loadedFeed = RssFeed.parse(feed.xml!);
+        }
       }
     }
     setState(() {});
@@ -86,7 +88,7 @@ class _FeedsPageState extends State<FeedsPage> {
                     },
                     icon: Icon(
                       Icons.refresh, 
-                      color: Theme.of(context).textTheme.bodyText2.color
+                      color: Theme.of(context).textTheme.bodyText2?.color
                     )
                   ),
                   IconButton(
@@ -98,7 +100,7 @@ class _FeedsPageState extends State<FeedsPage> {
                     },
                     icon: Icon(
                       Icons.settings, 
-                      color: Theme.of(context).textTheme.bodyText2.color
+                      color: Theme.of(context).textTheme.bodyText2?.color
                     )
                   )
                 ],
@@ -112,7 +114,7 @@ class _FeedsPageState extends State<FeedsPage> {
                   Text("Subscriptions", 
                     style: TextStyle(
                       fontSize: 32, 
-                      color: Theme.of(context).textTheme.subtitle1.color
+                      color: Theme.of(context).textTheme.subtitle1?.color
                     )
                   ),
                   Text("Swipe to delete", 
@@ -155,12 +157,12 @@ class _FeedsPageState extends State<FeedsPage> {
                             )
                           ],
                         ),
-                        subtitle: Text("Last updated: " + f.lastUpdate, style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color)),
+                        subtitle: Text("Last updated: " + (f.lastUpdate ?? "Unknown"), style: TextStyle(color: Theme.of(context).textTheme.bodyText2?.color)),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Badge(
-                              badgeContent: Text(f.loadedFeed?.items?.length?.toString() ?? "0", style: TextStyle(color: Colors.white)),
+                              badgeContent: Text(f.loadedFeed?.items.length.toString() ?? "0", style: TextStyle(color: Colors.white)),
                               badgeColor: Color(0xFF8185a3),
                             )
                           ],
@@ -174,7 +176,7 @@ class _FeedsPageState extends State<FeedsPage> {
                             );
                           }else{
                             if (f.loadedFeed != null) {
-                              loadFeed(f.loadedFeed);
+                              loadFeed(f.loadedFeed!);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -222,8 +224,8 @@ class _FeedsPageState extends State<FeedsPage> {
 
   Widget getActionButton(){
     if(offlineMode){
-      return null;
-    }else{
+      return Container();
+    }else{ 
       return FloatingActionButton(
         backgroundColor: Color(0xFF959abd),
         onPressed: () {
@@ -345,17 +347,9 @@ class _FeedsPageState extends State<FeedsPage> {
 
   Widget getFeedSubtitle(SavedFeed f){
     if(offlineMode){
-      if(f.xml == null){ // Feed was not saved somehow
-        return null;
-      }else{
-        return Text("Last Updated: " + f.lastUpdate);
-      }
+      return Text("Last Updated: " + (f.lastUpdate ?? "Unknown"));
     }else{
-      if(f.loadedFeed == null){
-        return null;
-      }else{
-        return Text(f.url);
-      }
+      return Text(f.url);
     }
   }
 
